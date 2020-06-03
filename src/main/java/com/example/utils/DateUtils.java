@@ -7,13 +7,14 @@ import java.util.Date;
 
 public class DateUtils {
 
-    public static Date createDate(String date) {
+    public static Date createDate(String stringDate) {
+        Date date;
         try {
-            new SimpleDateFormat("yyyy년MM월dd일").parse(date);
+            date = new SimpleDateFormat("yyyy년MM월dd일").parse(stringDate);
         } catch (ParseException e) {
-            return null;
+            date =  null;
         }
-        return null;
+        return date;
     }
 
     public static Date createNextDate(Date date) {
