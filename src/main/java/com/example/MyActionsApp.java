@@ -16,16 +16,21 @@
 
 package com.example;
 
+import com.example.apis.GoogleCalendarAPIs;
+import com.example.utils.DateUtils;
 import com.google.actions.api.ActionRequest;
 import com.google.actions.api.ActionResponse;
 import com.google.actions.api.DialogflowApp;
 import com.google.actions.api.ForIntent;
 import com.google.actions.api.response.ResponseBuilder;
-import com.google.api.services.actions_fulfillment.v2.model.User;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Date;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Implements all intent handlers for this Action. Note that your App must extend from DialogflowApp
@@ -35,20 +40,27 @@ public class MyActionsApp extends DialogflowApp {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MyActionsApp.class);
 
-  @ForIntent("Default Welcome Intent")
+  @ForIntent("Date Intent")
   public ActionResponse welcome(ActionRequest request) {
-    LOGGER.info("Welcome intent start.");
     ResponseBuilder responseBuilder = getResponseBuilder(request);
-    ResourceBundle rb = ResourceBundle.getBundle("resources");
-    User user = request.getUser();
+    Map<String, Object> map =  request.getWebhookRequest().getQueryResult().getParameters();
+    String year = (String) map.get("date-year");
+    String month = (String) map.get("date-month");
+    String day = (String) map.get("date-day");
 
-    if (user != null && user.getLastSeen() != null) {
-      responseBuilder.add(rb.getString("welcome_back"));
+    Date startDate = DateUtils.createDate(year + month + day);
+    if(startDate == null){
+      responseBuilder.add("날짜가 잘못되었습니다.");
     } else {
-      responseBuilder.add(rb.getString("welcome"));
+      try {
+        String response = new GoogleCalendarAPIs().getEventFromGoogleCalendar(startDate);
+      } catch (GeneralSecurityException | IOException e) {
+        e.printStackTrace();
+        responseBuilder.add(e.getMessage());
+      }
     }
 
-    LOGGER.info("Welcome intent end.");
+    // responseBuilder.add("SmartCity-Test");
     return responseBuilder.build();
   }
 
