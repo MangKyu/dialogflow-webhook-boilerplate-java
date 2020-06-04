@@ -16,19 +16,24 @@
 
 package com.example;
 
-import com.example.apis.GoogleCalendarAPIs;
+import com.example.model.CalendarResponse;
+import com.example.model.Item;
+import com.example.retrofit.RetrofitClient;
 import com.example.utils.DateUtils;
 import com.google.actions.api.ActionRequest;
 import com.google.actions.api.ActionResponse;
 import com.google.actions.api.DialogflowApp;
 import com.google.actions.api.ForIntent;
 import com.google.actions.api.response.ResponseBuilder;
+import com.google.api.client.util.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -41,7 +46,7 @@ public class MyActionsApp extends DialogflowApp {
   private static final Logger LOGGER = LoggerFactory.getLogger(MyActionsApp.class);
 
   @ForIntent("Date Intent")
-  public ActionResponse welcome(ActionRequest request) {
+  public ActionResponse welcome(ActionRequest request) throws IOException {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     Map<String, Object> map =  request.getWebhookRequest().getQueryResult().getParameters();
     String year = (String) map.get("date-year");
@@ -52,15 +57,20 @@ public class MyActionsApp extends DialogflowApp {
     if(startDate == null){
       responseBuilder.add("날짜가 잘못되었습니다.");
     } else {
-      try {
-        String response = new GoogleCalendarAPIs().getEventFromGoogleCalendar(startDate);
-      } catch (GeneralSecurityException | IOException e) {
-        e.printStackTrace();
-        responseBuilder.add(e.getMessage());
-      }
+        Call<CalendarResponse> call = RetrofitClient.getInstance().getService().getEventList(new DateTime(startDate), new DateTime(DateUtils.createNextDate(startDate)));
+        Response<CalendarResponse> response = call.execute();
+        if (response.isSuccessful()){
+          List<Item> itemList = response.body().getItems();
+          if(itemList != null){
+            for (Item item : itemList) {
+              responseBuilder.add(item.getSummary()).add("\n");
+            }
+          }
+        }else {
+          responseBuilder.add(response.errorBody().string());
+        }
     }
 
-    // responseBuilder.add("SmartCity-Test");
     return responseBuilder.build();
   }
 
