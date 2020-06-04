@@ -16,6 +16,7 @@
 
 package com.example;
 
+import com.example.apis.GoogleCalendarAPIs;
 import com.example.model.CalendarResponse;
 import com.example.model.Item;
 import com.example.retrofit.RetrofitClient;
@@ -32,6 +33,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +65,9 @@ public class MyActionsApp extends DialogflowApp {
           List<Item> itemList = response.body().getItems();
           if(itemList != null){
             for (Item item : itemList) {
-              responseBuilder.add(item.getSummary()).add("\n");
+              String[] times = item.getStart().getDateTime().split("T")[1].split(":");
+              String msg = item.getSummary() + " " + times[0] + ":" + times[1] + item.getSummary();
+              responseBuilder.add(msg);
             }
           }
         }else {
@@ -71,6 +75,7 @@ public class MyActionsApp extends DialogflowApp {
         }
     }
 
+    // responseBuilder.add("SmartCity-Test");
     return responseBuilder.build();
   }
 
