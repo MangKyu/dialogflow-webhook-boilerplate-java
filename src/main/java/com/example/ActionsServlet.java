@@ -18,6 +18,7 @@ package com.example;
 
 import com.google.actions.api.App;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,5 +97,34 @@ public class ActionsServlet extends HttpServlet {
     }
     return map;
   }
+
+  /* Spring with Java Code
+  @GetMapping(value = "/rd")
+  public void GoogleSignCallback(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
+    String code = request.getParameter("code");
+    HttpHeaders headers = new HttpHeaders();
+    RestTemplate restTemplate = new RestTemplate();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+    MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+    parameters.add("code", code);
+    parameters.add("client_id", "248471656671-r8lkjne2krdjeg7o1kgjn1prk9b1gu9c.apps.googleusercontent.com");
+    parameters.add("client_secret", "QMparoxlBocuStPPxUIPKA-L");
+    parameters.add("redirect_uri", "http://localhost:8091/rd");
+    parameters.add("grant_type", "authorization_code");
+
+    HttpEntity<MultiValueMap<String,String>> rest_request = new HttpEntity<>(parameters,headers);
+
+    URI uri = URI.create("https://www.googleapis.com/oauth2/v4/token");
+
+    ResponseEntity<String> rest_reponse = restTemplate.postForEntity(uri, rest_request, String.class);
+    String bodys = rest_reponse.getBody();
+    System.out.println(bodys);
+
+    model.addAttribute("token", token);
+    response.sendRedirect("http://localhost:8091/token");
+
+  }
+  */
 
 }

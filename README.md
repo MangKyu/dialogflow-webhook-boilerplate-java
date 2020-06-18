@@ -1,5 +1,4 @@
-# Actions on Google: Webhook Boilerplate
-
+gc
 Boilerplate to help you get started quickly with the Java client library for Actions on Google.
 
 ### Setup Instructions
@@ -54,3 +53,25 @@ See [LICENSE](LICENSE).
  
 ### Terms
 Your use of this sample is subject to, and by using or downloading the sample files you agree to comply with, the [Google APIs Terms of Service](https://developers.google.com/terms/).
+
+
+
+# 사용법
+1. 웹훅 서버를 생성하고, 웹훅 코드를 작성하여 서버를 실행시킴
+
+2. API 발급 URL로 접속하여 키를 발급받음
+https://accounts.google.com/o/oauth2/v2/auth?
+scope=https://www.googleapis.com/auth/calendar.events.readonly&
+access_type=offline&
+include_granted_scopes=true&state=state_parameter_passthrough_value&
+redirect_uri=http://localhost:8091/rd&response_type=code&client_id=248471656671-r8lkjne2krdjeg7o1kgjn1prk9b1gu9c.apps.googleusercontent.com
+
+3. RetrofitClient의 token을 발급받은 토큰에 맞게 수정함
+4. 구글 AppEngine을 deploy 시킴
+5. 어시스턴트를 적용시킴 
+
+# 구글 결제 계좌 설정
+https://console.developers.google.com/billing/projects
+
+# CURL
+curl -H "Authorization: Bearer ya29.a0AfH6SMAm1A4bOYRkntyI6A9JwzJRb_zCqOlphDscdq89M2KLr8TL8BY2QvNloI2M43GN1aXDGCtjlGp6kAKhH-qUF9Fx0h3leoE6QDZVFPAU3RwijwaLtpIt0iX7EaLLDRcYAyP-H7yIXDSuyVZSj7zR-ybRRCrcuSk" https://www.googleapis.com/calendar/v3/calendars/whalsrb1226@gmail.com/events?singleEvents=true&timeMax=2020-05-05T00:00:00Z&timeMin=2020-05-05T23:00:00Z
